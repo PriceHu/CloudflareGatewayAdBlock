@@ -68,7 +68,6 @@ def get_firewall_policies(name_prefix: str):
     )
 
     logger.debug(f"[get_firewall_policies] {r.status_code}")
-    # logger.debug(f"{r.json()}")
 
     if r.status_code != 200:
         raise Exception("Failed to get Cloudflare firewall policies")
@@ -102,10 +101,13 @@ def create_gateway_policy(name: str, list_ids: List[str]):
     return r.json()["result"]
 
 
-def update_gateway_policy(policy_id: str, list_ids: List[str]):
+def update_gateway_policy(name: str, policy_id: str, list_ids: List[str]):
     r = session.put(
         f"https://api.cloudflare.com/client/v4/accounts/{CF_IDENTIFIER}/gateway/rules/{policy_id}",
         json={
+            "name": name,
+            "action": "block",
+            "enabled": True,
             "traffic": "or".join([f"any(dns.domains[*] in ${l})" for l in list_ids]),
         },
     )
