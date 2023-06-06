@@ -1,4 +1,5 @@
 import logging
+import sys
 import pathlib
 from typing import List
 import requests
@@ -9,7 +10,7 @@ class App:
     def __init__(self, adlist_name: str, adlist_url: str):
         self.adlist_name = adlist_name
         self.adlist_url = adlist_url
-        self.name_prefix = f"[AdBlock-{adlist_name}]"
+        self.name_prefix = f"[{adlist_name}]"
         self.logger = logging.getLogger("main")
 
     def run(self):
@@ -36,7 +37,7 @@ class App:
 
             # chunk the domains into lists of 1000 and create them
             for chunk in self.chunk_list(domains, 1000):
-                list_name = f"{self.name_prefix} {len(cf_lists) + 1}"
+                list_name = f"{self.name_prefix} AdBlock Domain List {len(cf_lists) + 1}"
 
                 self.logger.info(f"Creating list {list_name}")
 
@@ -118,5 +119,13 @@ class App:
 
 if __name__ == "__main__":
     app = App("Adaway", "https://adaway.org/hosts.txt")
+
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s: [%(name)s]<%(levelname)s> %(message)s')
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
 
     app.run()
